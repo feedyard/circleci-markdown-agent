@@ -4,7 +4,7 @@ jobs:
   build:
     working_directory: ~/circleci-markdown-agent
     environment:
-      LIBRARY: quay.io/feedyard
+      LIBRARY: feedyard
       CONTAINER_NAME: circleci-markdown-agent
       VERSION: 3.6
       BASH_ENV: .circlerc
@@ -30,11 +30,11 @@ jobs:
           command: |
             inspec exec profiles/cis-docker
             CID="$(docker run -it -d $LIBRARY/$CONTAINER_NAME:latest ash)"
-            inspec exec profiles/circleci-infra-agent/ -t docker://$CID
+            inspec exec profiles/circleci-markdown-agent/ -t docker://$CID
             docker rm -f $CID
       - deploy:
-          name: deploy to quay.io
+          name: deploy to docker hub
           command: |
-            docker login -u $QUAY_USER -p $QUAY_PASS quay.io
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push $LIBRARY/$CONTAINER_NAME:$VERSION.$CIRCLE_BUILD_NUM
             docker push $LIBRARY/$CONTAINER_NAME:latest
