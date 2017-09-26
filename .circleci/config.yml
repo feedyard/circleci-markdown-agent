@@ -1,0 +1,40 @@
+version: 2
+
+jobs:
+  build:
+    working_directory: ~/circleci-markdown-agent
+    environment:
+      LIBRARY: quay.io/feedyard
+      CONTAINER_NAME: circleci-markdown-agent
+      VERSION: 3.6
+      BASH_ENV: .circlerc
+    docker:
+      - image: feedyard/circleci-docker # build using feedyard circleci baseline runner
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: confirm Docker
+          command: 'docker info'
+      - run:
+          name: decrypt secrets
+          command: 'openssl aes-256-cbc -d -in secrets.ci -out .circlerc -k $KEY'
+      - run:
+          name: build image
+          command: 'docker build -t $LIBRARY/$CONTAINER_NAME:latest .'
+      - run:
+          name: tag with build version
+          command: 'docker tag $LIBRARY/$CONTAINER_NAME:latest $LIBRARY/$CONTAINER_NAME:$VERSION.$CIRCLE_BUILD_NUM'
+      - run:
+          name: configuration tests
+          command: |
+            inspec exec profiles/cis-docker
+            CID="$(docker run -it -d $LIBRARY/$CONTAINER_NAME:latest ash)"
+            inspec exec profiles/circleci-infra-agent/ -t docker://$CID
+            docker rm -f $CID
+      - deploy:
+          name: deploy to quay.io
+          command: |
+            docker login -u $QUAY_USER -p $QUAY_PASS quay.io
+            docker push $LIBRARY/$CONTAINER_NAME:$VERSION.$CIRCLE_BUILD_NUM
+            docker push $LIBRARY/$CONTAINER_NAME:latest
