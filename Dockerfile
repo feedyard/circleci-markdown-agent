@@ -9,7 +9,7 @@ RUN apk add --no-cache git openssh tar gzip ca-certificates
 
 # general packages to support markdown lint oriented docker images
 RUN apk add --no-cache bash bash-doc bash-completion \
-    python3 ruby ruby-bundler ruby-dev g++ libffi-dev \
+    openssl openrc python3 ruby ruby-bundler ruby-dev g++ libffi-dev \
     musl-dev make docker
 RUN rc-update add docker boot
 

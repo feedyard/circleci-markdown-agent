@@ -8,6 +8,8 @@ control 'packages' do
     its('stdout') { should include ('tar') }
     its('stdout') { should include ('gzip') }
     its('stdout') { should include ('ca-certificates') }
+    its('stdout') { should include ('openssl') }
+    its('stdout') { should include ('openrc') }
     its('stdout') { should include ('python3') }
     its('stdout') { should include ('ruby') }
     its('stdout') { should include ('ruby-bundler') }
@@ -65,6 +67,24 @@ control 'gzip version' do
   end
 end
 
+control 'openssl version' do
+  impact 1.0
+  title 'confirm openssl version installed'
+  desc 'confirm version reported by openssl matches the desired version'
+  describe command('openssl version') do
+    its('stdout') { should include ('1.0.2') }
+  end
+end
+
+control 'openrc version' do
+  impact 1.0
+  title 'confirm openrc version installed'
+  desc 'confirm version reported by openrc matches the desired version'
+  describe command('openrc -V') do
+    its('stdout') { should include ('0.24.1') }
+  end
+end
+
 control 'python3 version' do
   impact 1.0
   title 'confirm python3 version installed'
@@ -79,7 +99,7 @@ control 'ruby version' do
   title 'confirm ruby version installed'
   desc 'confirm version reported by ruby matches the desired version'
   describe command('ruby -v') do
-    its('stdout') { should include ('2.4.1') }
+    its('stdout') { should include ('2.4.2') }
   end
 end
 
@@ -133,7 +153,7 @@ control 'invoke version' do
   title 'confirm invoke version installed'
   desc 'confirm version reported by invoke matches the desired version'
   describe command('invoke -V') do
-    its('stdout') { should include ('0.20') }
+    its('stdout') { should include ('0.21') }
   end
 end
 
